@@ -35,7 +35,7 @@ func (pool *Pool) Start() {
 				err := client.Conn.WriteJSON(Message{
 					Type:     1,
 					ClientID: client.ID,
-					Body:     "New user: " + client.ID + " Joined...",
+					Body:     "New User Joined...",
 				})
 				if err != nil {
 					fmt.Println(err)
@@ -49,7 +49,7 @@ func (pool *Pool) Start() {
 				err := client.Conn.WriteJSON(Message{
 					Type:     1,
 					ClientID: client.ID,
-					Body:     "User: " + client.ID + " Disconnected..."})
+					Body:     "User Disconnected..."})
 				if err != nil {
 					fmt.Println(err)
 				}

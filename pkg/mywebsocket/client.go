@@ -13,8 +13,16 @@ type Client struct {
 }
 
 type Message struct {
-	Type int    `json:"type"`
-	Body string `json:"body"`
+	Type     int    `json:"type"`
+	ClientID string `json:"clientid"`
+	Body     string `json:"body"`
+}
+
+func NewClient(conn *websocket.Conn, pool *Pool) *Client {
+	return &Client{
+		Conn: conn,
+		Pool: pool,
+	}
 }
 
 func (c *Client) Read() {
@@ -31,6 +39,7 @@ func (c *Client) Read() {
 		}
 		message := Message{Type: messageType, Body: string(p)}
 		c.Pool.Broadcast <- message
+		//c.Pool.PrivateTalk.PrivateMsg <-message
 		fmt.Printf("Message Received: %+v\n", message)
 	}
 }

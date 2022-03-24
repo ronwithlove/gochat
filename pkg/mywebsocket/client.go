@@ -21,6 +21,7 @@ type Message struct {
 func NewClient(conn *websocket.Conn, pool *Pool) *Client {
 	return &Client{
 		Conn: conn,
+		ID:   conn.RemoteAddr().String(),
 		Pool: pool,
 	}
 }
@@ -37,9 +38,13 @@ func (c *Client) Read() {
 			log.Println(err)
 			return
 		}
-		message := Message{Type: messageType, Body: string(p)}
+		message := Message{
+			Type:     messageType,
+			ClientID: c.ID,
+			Body:     string(p)}
 		c.Pool.Broadcast <- message
+		fmt.Printf("%s Broadcast Message: %+v\n", c.ID, message)
+
 		//c.Pool.PrivateTalk.PrivateMsg <-message
-		fmt.Printf("Message Received: %+v\n", message)
 	}
 }

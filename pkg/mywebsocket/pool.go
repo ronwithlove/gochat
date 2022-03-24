@@ -29,21 +29,34 @@ func (pool *Pool) Start() {
 		select {
 		case client := <-pool.Register:
 			pool.Clients[client] = true
-			fmt.Println("Size of Connection Pool: ", len(pool.Clients))
+			fmt.Println("Server Size of Connection Pool: ", len(pool.Clients))
 			for client, _ := range pool.Clients {
-				fmt.Println(client.Conn.RemoteAddr().String())
-				client.Conn.WriteJSON(Message{Type: 1, Body: "New user: " + client.Conn.RemoteAddr().String() + " Joined..."})
+				fmt.Println(client.ID)
+				err := client.Conn.WriteJSON(Message{
+					Type:     1,
+					ClientID: client.ID,
+					Body:     "New user: " + client.ID + " Joined...",
+				})
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
 			break
 		case client := <-pool.Unregister:
 			delete(pool.Clients, client)
-			fmt.Println("Size of Connection Pool: ", len(pool.Clients))
+			fmt.Println("Server Size of Connection Pool: ", len(pool.Clients))
 			for client, _ := range pool.Clients {
-				client.Conn.WriteJSON(Message{Type: 1, Body: "User: " + client.Conn.RemoteAddr().String() + " Disconnected..."})
+				err := client.Conn.WriteJSON(Message{
+					Type:     1,
+					ClientID: client.ID,
+					Body:     "User: " + client.ID + " Disconnected..."})
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
 			break
 		case message := <-pool.Broadcast:
-			fmt.Println("Sending message to all clients in Pool: ",message)
+			fmt.Println("Server Broadcast: Sending message to all clients in Pool: ", message)
 			for client, _ := range pool.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {
 					fmt.Println(err)

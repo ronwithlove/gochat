@@ -6,18 +6,29 @@ import (
 	"net/http"
 )
 
-// 定义 WebSocket 服务处理函数
-func serveWs(w http.ResponseWriter, r *http.Request) {
-	ws, err := mywebsocket.Upgrade(w, r)
+func serveWs(pool *mywebsocket.Pool, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("WebSocket Endpoint Hit")
+	conn, err := mywebsocket.Upgrade(w, r)
 	if err != nil {
-		fmt.Fprintf(w, "%+V\n", err)
+		fmt.Fprintf(w, "%+v\n", err)
 	}
-	go mywebsocket.Writer(ws)
-	mywebsocket.Reader(ws)
+
+	client := &mywebsocket.Client{
+		Conn: conn,
+		Pool: pool,
+	}
+
+	pool.Register <- client
+	client.Read()
 }
 
 func setupRoutes() {
-	http.HandleFunc("/ws", serveWs)
+	pool := mywebsocket.NewPool()
+	go pool.Start()
+
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		serveWs(pool, w, r)
+	})
 }
 
 func main() {

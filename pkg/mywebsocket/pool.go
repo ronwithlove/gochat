@@ -6,7 +6,7 @@ type Pool struct {
 	Register    chan *Client
 	Unregister  chan *Client
 	Clients     map[*Client]bool
-	Broadcast   chan Message
+	Broadcast   chan RecivedString
 	PrivateTalk chan RecivedString
 }
 
@@ -15,7 +15,7 @@ func NewPool() *Pool {
 		Register:    make(chan *Client),
 		Unregister:  make(chan *Client),
 		Clients:     make(map[*Client]bool),
-		Broadcast:   make(chan Message),
+		Broadcast:   make(chan RecivedString),
 		PrivateTalk: make(chan RecivedString),
 	}
 }
@@ -28,10 +28,10 @@ func (pool *Pool) Start() {
 			fmt.Println("Server Size of Connection Pool: ", len(pool.Clients))
 			for client, _ := range pool.Clients {
 				fmt.Println(client.ID)
-				err := client.Conn.WriteJSON(Message{
-					Type:     1,
+				err := client.Conn.WriteJSON(RecivedString{
+					ChatType:     "Public",
 					ClientID: client.ID,
-					Body:     "New User Joined...",
+					Message:     "New User Joined...",
 				})
 				if err != nil {
 					fmt.Println(err)
@@ -42,10 +42,10 @@ func (pool *Pool) Start() {
 			delete(pool.Clients, client)
 			fmt.Println("Server Size of Connection Pool: ", len(pool.Clients))
 			for client, _ := range pool.Clients {
-				err := client.Conn.WriteJSON(Message{
-					Type:     1,
+				err := client.Conn.WriteJSON(RecivedString{
+					ChatType:     "Public",
 					ClientID: client.ID,
-					Body:     "User Disconnected..."})
+					Message:     "User Disconnected..."})
 				if err != nil {
 					fmt.Println(err)
 				}

@@ -40,16 +40,16 @@ func (c *Client) Read() {
 	}()
 
 	for {
-		messageType, p, err := c.Conn.ReadMessage()
+		_, p, err := c.Conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		message := Message{
-			Type:     messageType,
-			ClientID: c.ID,
-			Body:     string(p),
-		}
+		//message := Message{
+		//	Type:     messageType,
+		//	ClientID: c.ID,
+		//	Body:     string(p),
+		//}
 
 		var r RecivedString
 		err = json.Unmarshal(p, &r)
@@ -63,8 +63,8 @@ func (c *Client) Read() {
 			c.Pool.PrivateTalk <- r
 
 		} else {
-			c.Pool.Broadcast <- message
-			fmt.Printf("%s Broadcast Message: %+v\n", c.ID, message)
+			c.Pool.Broadcast <- r
+			fmt.Printf("%s Broadcast Message: %+v\n", c.ID, r)
 		}
 
 	}

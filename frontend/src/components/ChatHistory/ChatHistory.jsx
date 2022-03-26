@@ -14,7 +14,7 @@ class ChatHistory extends Component {
     componentDidMount() {
         connect((msg) => {
             this.setState({
-            chatHistory: [...this.state.chatHistory, msg]
+                chatHistory: [...this.state.chatHistory, msg]
             })
         });
     }

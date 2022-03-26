@@ -62,15 +62,8 @@ func (pool *Pool) Start() {
 		case privateMsg := <-pool.PrivateTalk:
 			fmt.Println("Sending message to one client in Pool",privateMsg.MyID,":",privateMsg.ClientID)
 			for client := range pool.Clients {
-				if client.ID == privateMsg.ClientID {
+				if client.ID == privateMsg.ClientID || client.ID == privateMsg.MyID{
 					fmt.Println("match:", client.ID)
-					if err := client.Conn.WriteJSON(privateMsg)
-						err != nil {
-						fmt.Println("private conn err:",err)
-						return
-					}
-				}else if client.ID == privateMsg.MyID {
-					fmt.Println("MyID:", client.ID)
 					if err := client.Conn.WriteJSON(privateMsg)
 						err != nil {
 						fmt.Println("private conn err:",err)

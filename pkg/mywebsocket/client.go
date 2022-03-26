@@ -1,6 +1,7 @@
 package mywebsocket
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
@@ -26,6 +27,12 @@ func NewClient(conn *websocket.Conn, pool *Pool) *Client {
 	}
 }
 
+type RecivedString struct {
+	ChatType string `json:"chatType"`
+	ClientID string `json:"clientId"`
+	Message  string `json:"message"`
+}
+
 func (c *Client) Read() {
 	defer func() {
 		c.Pool.Unregister <- c
@@ -41,10 +48,24 @@ func (c *Client) Read() {
 		message := Message{
 			Type:     messageType,
 			ClientID: c.ID,
-			Body:     string(p)}
-		c.Pool.Broadcast <- message
-		fmt.Printf("%s Broadcast Message: %+v\n", c.ID, message)
+			Body:     string(p),
+		}
 
-		//c.Pool.PrivateTalk.PrivateMsg <-message
+		var r RecivedString
+		err = json.Unmarshal(p, &r)
+		if err != nil {
+			fmt.Printf(err.Error())
+			return
+		}
+
+		if r.ChatType == "Private" {
+			fmt.Println("private")
+			c.Pool.PrivateTalk <- r
+
+		} else {
+			c.Pool.Broadcast <- message
+			fmt.Printf("%s Broadcast Message: %+v\n", c.ID, message)
+		}
+
 	}
 }

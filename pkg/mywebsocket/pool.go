@@ -3,24 +3,20 @@ package mywebsocket
 import "fmt"
 
 type Pool struct {
-	Register   chan *Client
-	Unregister chan *Client
-	Clients    map[*Client]bool
-	Broadcast  chan Message
-	PrivateTalk
-}
-
-type PrivateTalk struct {
-	PrivateMsg chan Message
-	Client
+	Register    chan *Client
+	Unregister  chan *Client
+	Clients     map[*Client]bool
+	Broadcast   chan Message
+	PrivateTalk chan RecivedString
 }
 
 func NewPool() *Pool {
 	return &Pool{
-		Register:   make(chan *Client),
-		Unregister: make(chan *Client),
-		Clients:    make(map[*Client]bool),
-		Broadcast:  make(chan Message),
+		Register:    make(chan *Client),
+		Unregister:  make(chan *Client),
+		Clients:     make(map[*Client]bool),
+		Broadcast:   make(chan Message),
+		PrivateTalk: make(chan RecivedString),
 	}
 }
 
@@ -63,12 +59,16 @@ func (pool *Pool) Start() {
 					return
 				}
 			}
-		case privateMsg := <-pool.PrivateTalk.PrivateMsg:
-			fmt.Println("Sending message to all clients in Pool")
-			if _, ok := pool.Clients[&pool.PrivateTalk.Client]; ok {
-				if err := pool.PrivateTalk.Client.Conn.WriteJSON(privateMsg); err != nil {
-					fmt.Println(err)
-					return
+		case privateMsg := <-pool.PrivateTalk:
+			fmt.Println("Sending message to one client in Pool")
+			for client := range pool.Clients {
+				if client.ID == privateMsg.ClientID {
+					fmt.Println("match:", client.ID)
+					if err := client.Conn.WriteJSON(privateMsg)
+						err != nil {
+						fmt.Println("private conn err:",err)
+						return
+					}
 				}
 			}
 		}

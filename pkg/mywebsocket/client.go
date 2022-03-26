@@ -28,6 +28,7 @@ func NewClient(conn *websocket.Conn, pool *Pool) *Client {
 }
 
 type RecivedString struct {
+	MyID     string `json:"myid"`
 	ChatType string `json:"chatType"`
 	ClientID string `json:"clientId"`
 	Message  string `json:"message"`
@@ -45,11 +46,6 @@ func (c *Client) Read() {
 			log.Println(err)
 			return
 		}
-		//message := Message{
-		//	Type:     messageType,
-		//	ClientID: c.ID,
-		//	Body:     string(p),
-		//}
 
 		var r RecivedString
 		err = json.Unmarshal(p, &r)
@@ -59,7 +55,8 @@ func (c *Client) Read() {
 		}
 
 		if r.ChatType == "Private" {
-			fmt.Println("private")
+			r.MyID=c.ID
+			fmt.Println("private","c.ID:",c.ID,"myid:",r.MyID)
 			c.Pool.PrivateTalk <- r
 
 		} else {

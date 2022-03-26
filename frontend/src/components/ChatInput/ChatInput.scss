@@ -1,16 +1,65 @@
 .ChatInput {
-  width: 95%;
-  display: block;
-  margin: auto;
-
-  input {
-    padding: 10px;
-    margin: 0;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    width: 98%;
-    box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    margin: auto;
   }
-}
+
+  #ChatInput_Item {
+    height: 60px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+    #ChatInput_Item_Title {
+      width: 120px;
+      margin-right: 10px;
+      text-align: right;
+
+      border-left: 3px solid #15223b;
+    }
+
+      #ChatInput_Item label {
+        color: #15223b;
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      #ChatInput_Item select {
+        padding: 10px;
+        margin: 0;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        width: 520px;
+        box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.1);
+      }
+
+      #ChatInput_Item input {
+        padding: 10px;
+        margin: 0;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        width: 500px;
+        box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.1);
+      }
+
+  #ChatInput_Button {
+    margin-top: 30px;
+
+  }
+
+      #ChatInput_Button button {
+        width: 660px;
+        height: 40px;
+        border: none;
+        border-radius: 5px;
+        font-size: 20px;
+        // margin-left: 20px;
+
+        color: white;
+        background-color: #4AD395;
+      }

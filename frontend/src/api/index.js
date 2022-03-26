@@ -9,7 +9,6 @@ let connect = cb => {
     };
   
     socket.onmessage = msg => {
-      console.log(msg);
       cb(msg);
     };
   
@@ -20,11 +19,11 @@ let connect = cb => {
     socket.onerror = error => {
       console.log("Socket Error: ", error);
     };
-  };
+};
 
 let sendMsg = msg => {
-    console.log("sending msg: ", msg);
-    socket.send(msg);
+  console.log("sending msg: ", msg);
+  socket.send(msg);
 };
 
 export { connect, sendMsg };

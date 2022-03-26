@@ -47,8 +47,9 @@ func Setup() *gin.Engine {
 	return r
 }
 
+var pool = mywebsocket.NewPool()
+
 func IndexHandler(c *gin.Context) {
-	pool := mywebsocket.NewPool()
 	go pool.Start()
 
 	fmt.Println("WebSocket Endpoint Hit")

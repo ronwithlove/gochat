@@ -21,17 +21,19 @@ func NewPool() *Pool {
 }
 
 func (pool *Pool) Start() {
+	var theClientID string
 	for {
 		select {
 		case client := <-pool.Register:
 			pool.Clients[client] = true
+			theClientID = client.ID
 			fmt.Println("Server Size of Connection Pool: ", len(pool.Clients))
 			for client, _ := range pool.Clients {
 				fmt.Println(client.ID)
 				err := client.Conn.WriteJSON(RecivedString{
-					ChatType:     "Public",
-					ClientID: client.ID,
-					Message:     "New User Joined...",
+					ChatType: "Public",
+					ClientID: theClientID,
+					Message:  "New User Joined...",
 				})
 				if err != nil {
 					fmt.Println(err)
@@ -39,13 +41,14 @@ func (pool *Pool) Start() {
 			}
 			break
 		case client := <-pool.Unregister:
+			theClientID = client.ID
 			delete(pool.Clients, client)
 			fmt.Println("Server Size of Connection Pool: ", len(pool.Clients))
 			for client, _ := range pool.Clients {
 				err := client.Conn.WriteJSON(RecivedString{
-					ChatType:     "Public",
-					ClientID: client.ID,
-					Message:     "User Disconnected..."})
+					ChatType: "Public",
+					ClientID: theClientID,
+					Message:  "User Disconnected..."})
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -60,13 +63,13 @@ func (pool *Pool) Start() {
 				}
 			}
 		case privateMsg := <-pool.PrivateTalk:
-			fmt.Println("Sending message to one client in Pool",privateMsg.MyID,":",privateMsg.ClientID)
+			fmt.Println("Sending message to one client in Pool", privateMsg.MyID, ":", privateMsg.ClientID)
 			for client := range pool.Clients {
-				if client.ID == privateMsg.ClientID || client.ID == privateMsg.MyID{
+				if client.ID == privateMsg.ClientID || client.ID == privateMsg.MyID {
 					fmt.Println("match:", client.ID)
 					if err := client.Conn.WriteJSON(privateMsg)
 						err != nil {
-						fmt.Println("private conn err:",err)
+						fmt.Println("private conn err:", err)
 						return
 					}
 				}
